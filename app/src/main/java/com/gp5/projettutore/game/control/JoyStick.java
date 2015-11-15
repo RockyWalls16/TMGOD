@@ -5,89 +5,28 @@ package com.gp5.projettutore.game.control;
  */
 public class JoyStick
 {
-    private static EnumDirection joystickDirection;
+    /*private static EnumDirection joystickDirection;
 
     public static EnumDirection getJoystickDirection()
     {
         return joystickDirection;
-    }
+    }*/
+    private static float angle;
+    private static float force = 0F;
 
     public static void calculateDirection(float jX, float jY)
     {
-        //The joystick is topAligned
-        if(jY < -0.2F)
-        {
-            if(jX > 0.7F)
-            {
-                joystickDirection = EnumDirection.NORTH_EAST;
-                return;
-            }
-            else if(jX < -0.2F)
-            {
-                joystickDirection = EnumDirection.NORTH_WEST;
-                return;
-            }
-            else
-            {
-                joystickDirection = EnumDirection.NORTH;
-                return;
-            }
-        }
-        //The joystick is bottom aligned
-        else if(jY > 0.2F)
-        {
-            if(jX > 0.7F)
-            {
-                joystickDirection = EnumDirection.SOUTH_EAST;
-                return;
-            }
-            else if(jX < -0.2F)
-            {
-                joystickDirection = EnumDirection.SOUTH_WEST;
-                return;
-            }
-            else
-            {
-                joystickDirection = EnumDirection.SOUTH;
-                return;
-            }
-        }
-        //The joystick is left aligned
-        else if(jX < -0.2F)
-        {
-            if(jY > 0.7F)
-            {
-                joystickDirection = EnumDirection.SOUTH_WEST;
-                return;
-            }
-            else if(jY < -0.2F)
-            {
-                joystickDirection = EnumDirection.NORTH_WEST;
-                return;
-            }
-            else
-            {
-                joystickDirection = EnumDirection.WEST;
-                return;
-            }
-        }
-        //The joystick is right aligned
-        else if(jX > 0.2F)
-        {
-            if (jY > 0.7F)
-            {
-                joystickDirection = EnumDirection.SOUTH_EAST;
-                return;
-            } else if (jY < -0.2F)
-            {
-                joystickDirection = EnumDirection.NORTH_EAST;
-                return;
-            } else
-            {
-                joystickDirection = EnumDirection.EAST;
-                return;
-            }
-        }
-        joystickDirection = null;
+        angle = (float) (Math.atan2(jX, jY) * 180F / Math.PI + 180F);
+        force = (float) (Math.min(100, Math.sqrt((jX * jX) + (jY * jY)) * 100F));
+    }
+
+    public static float getAngle()
+    {
+        return angle;
+    }
+
+    public static float getForce()
+    {
+        return force;
     }
 }

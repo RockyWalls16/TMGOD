@@ -1,20 +1,22 @@
 package com.gp5.projettutore.game.entity;
 
-import android.util.Log;
-
-import com.gp5.projettutore.game.control.EnumDirection;
 import com.gp5.projettutore.game.control.JoyStick;
 import com.gp5.projettutore.game.level.Level;
-import com.gp5.projettutore.game.main.Core;
+import com.gp5.projettutore.game.render.GameRenderer;
 import com.gp5.projettutore.game.render.SpriteAtlas;
 import com.gp5.projettutore.game.render.Textures;
 
-/**
- * Created by Valentin on 04/10/2015.
- */
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
+
 public class EntityPlayer extends Entity
 {
-    private static final SpriteAtlas SPRITE_ATLAS = new SpriteAtlas(Textures.playerTexture, 32, 32, 4, 3, 1, 1);
+    private static final SpriteAtlas SPRITE_ATLAS = new SpriteAtlas(Textures.cellingTexture, 32, 32, 4, 3, 1, 1);
 
     public EntityPlayer(Level level, float x, float z)
     {
@@ -24,16 +26,22 @@ public class EntityPlayer extends Entity
     public void onUpdateTick()
     {
         super.onUpdateTick();
+        x = body.getPosition().x;
+        z = body.getPosition().y;
     }
 
     public void userControlTick()
     {
-        EnumDirection direction = JoyStick.getJoystickDirection();
-
-        if(direction != null)
+        if(JoyStick.getForce() > 40)
         {
-            x += EnumDirection.values()[(direction.ordinal() + Core.rotateAngle) % 8].getX() * 0.2F;
-            z += EnumDirection.values()[(direction.ordinal() + Core.rotateAngle) % 8].getY() * 0.2F;
+            GameRenderer.instance.setScaleAmount(0);
+            float fX = (float) Math.sin(Math.toRadians(JoyStick.getAngle() - GameRenderer.instance.getRotation())) * -8;
+            float fZ = (float) Math.cos(Math.toRadians(JoyStick.getAngle() - GameRenderer.instance.getRotation())) * -8;
+            body.setLinearVelocity(new Vec2(fX, fZ));
+        }
+        else
+        {
+            body.setLinearVelocity(new Vec2(0, 0));
         }
     }
 

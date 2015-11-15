@@ -21,6 +21,8 @@ public class Textures
     public static int floorTexture1;
     public static int floorTexture2;
     public static int floorTexture3;
+    public static int floorTexture4;
+    public static int floorTexture5;
     public static int cellingTexture;
 
     //Entities
@@ -41,7 +43,9 @@ public class Textures
         floorTexture1 = loadTexture(R.drawable.floor_1);
         floorTexture2 = loadTexture(R.drawable.floor_2);
         floorTexture3 = loadTexture(R.drawable.floor_3);
-        cellingTexture = loadTexture(R.drawable.celling);
+        floorTexture4 = loadTexture(R.drawable.floor_4);
+        floorTexture5 = loadTexture(R.drawable.floor_5);
+        cellingTexture = loadTexture(R.drawable.roof);
 
         playerTexture = loadTexture(R.drawable.player);
 
@@ -68,6 +72,8 @@ public class Textures
         textureCache = new int[1];
         GLES20.glGenTextures(1, textureCache, 0);
         GLES20.glBindTexture(GL10.GL_TEXTURE_2D, textureCache[0]);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
         GLES20.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
         GLES20.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
 

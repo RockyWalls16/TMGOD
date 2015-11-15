@@ -2,6 +2,12 @@ package com.gp5.projettutore.game.entity;
 
 import com.gp5.projettutore.game.level.Level;
 
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
+
 /**
  * Created by Valentin on 29/09/2015.
  */
@@ -19,12 +25,24 @@ public abstract class Entity
     //Used only to fall
     private float lastY;
     private float y;
+    protected Body body;
 
     public Entity(Level level, float x, float z)
     {
         this.level = level;
         this.x = x;
         this.z = z;
+
+        BodyDef boxDef = new BodyDef();
+        boxDef.position.set(x, z);
+        boxDef.type = BodyType.DYNAMIC;
+        CircleShape boxShape = new CircleShape();
+        boxShape.m_radius = 0.4F;
+        body = level.getWorld().createBody(boxDef);
+        FixtureDef boxFixture = new FixtureDef();
+        boxFixture.density = 0.1f;
+        boxFixture.shape = boxShape;
+        body.createFixture(boxFixture);
     }
 
     public void onUpdateTick()

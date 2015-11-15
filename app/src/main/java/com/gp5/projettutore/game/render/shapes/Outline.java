@@ -2,7 +2,7 @@ package com.gp5.projettutore.game.render.shapes;
 
 import android.opengl.GLES10;
 
-import com.gp5.projettutore.game.main.Core;
+import com.gp5.projettutore.game.level.Level;
 import com.gp5.projettutore.game.render.LevelElement;
 import com.gp5.projettutore.game.render.Textures;
 
@@ -15,13 +15,13 @@ public class Outline extends LevelElement
     private FloatBuffer vertexBuffer;
     private FloatBuffer texBuffer;
 
-    public Outline(int corner)
+    public Outline(Level level, int corner)
     {
         float[] vertices = null;
         float[] texCoords = null;
 
-        int width = Core.instance.getCurrentLevel().getWidth();
-        int height = Core.instance.getCurrentLevel().getHeight();
+        int width = level.getWidth();
+        int height = level.getHeight();
         /*
         * Corner order : top left, top right, bottom right, bottom left
         */
@@ -36,7 +36,7 @@ public class Outline extends LevelElement
                         width, 2.0F, 0.0F
                 };
                 texCoords = new float[]{
-                        0.0F, 0.0F,
+                        0.0F, 50.0F,
                         width + 50.0F, 50.0F,
                         0.0F, 0.0F,
                         width + 50.0F, 0.0F

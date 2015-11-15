@@ -20,6 +20,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.1.1'
+    compile files('libs/kollider-v0.3.jar')
+    compile files('libs/JBox2D-2.0.1-b250-Library.jar')
+    compile files('libs/jbox2d-library-2.1.2.2.jar')
+    compile files('libs/slf4j-api-1.6.6.jar')
+    compile files('libs/slf4j-simple-1.6.6.jar')
 }

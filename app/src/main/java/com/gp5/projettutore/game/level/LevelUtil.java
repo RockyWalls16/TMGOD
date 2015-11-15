@@ -1,15 +1,14 @@
 package com.gp5.projettutore.game.level;
 
+import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.main.MainActivity;
-import com.gp5.projettutore.game.render.LevelElement;
+import com.gp5.projettutore.game.render.Chunk;
 import com.gp5.projettutore.game.render.shapes.Floor;
-import com.gp5.projettutore.game.render.shapes.Outline;
 import com.gp5.projettutore.game.render.shapes.Roof;
 import com.gp5.projettutore.game.render.shapes.Wall;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -93,76 +92,193 @@ public class LevelUtil
      * @param level The level you want to use to create the render list
      * @return List of render elements
      */
-    public static ArrayList<LevelElement> getRenderList(Level level)
+    public static void getRenderList(Level level)
     {
-        ArrayList<LevelElement> renderList = new ArrayList<LevelElement>();
-        renderList.add(new Outline(0));
-        renderList.add(new Outline(1));
-        renderList.add(new Outline(2));
-        renderList.add(new Outline(3));
         for(int layer = 0; layer < 2; layer++)
         {
-            for (int x = 0; x < level.getWidth(); x++)
+            for (int cX = 0; cX < level.getChunkArrayWidth(); cX++)
             {
-                for (int z = 0; z < level.getHeight(); z++)
+                for (int cZ = 0; cZ < level.getChunkArrayHeight(); cZ++)
                 {
-                    int id = level.getTileAt(layer, x, z);
+                    Chunk chunk = level.getChunks()[cX][cZ];
 
-                    if(id == 0 && layer == 0)
+                    boolean[][][] mask = new boolean[4][4][2];
+                    for(int x = 0;x < 4;x++)
                     {
-                        renderList.add(new Roof(x, z));
-                    }
-                    if (id > 0 && id <= 36)
-                    {
-                        int wallStyle = ((id - 1) / 12) + 1;
-                        int wallType = (id - 1) % 12;
-
-                        if(wallType < 8)
+                        for(int z = 0;z < 4;z++)
                         {
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], wallType, x, z));
-                            if (id % 2 == 0)
+                            int rX = chunk.getX() * 4 + x;
+                            int rZ = chunk.getZ() * 4 + z;
+
+                            int id = getTileOnChunkAt(chunk, layer, x, z);
+
+                            if(id == 0 && layer == 0 && !mask[x][z][0])
                             {
-                                renderList.add(new Roof(x, z));
+                                int width = 0;
+                                int height = 0;
+
+                                mainLoop: for (int x2 = x; x2 < 4; x2++)
+                                {
+                                    if (x2 == x)
+                                    {
+                                        for (int z2 = z; z2 < 4; z2++)
+                                        {
+                                            if (!mask[x2][z2][0] && getTileOnChunkAt(chunk, layer, x2, z2) == 0)
+                                            {
+                                                width++;
+                                                mask[x2][z2][0] = true;
+                                            }
+                                            else
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int z2 = z; z2 < z + width; z2++)
+                                        {
+                                            if (mask[x2][z2][0] || getTileOnChunkAt(chunk, layer, x2, z2) != 0)
+                                            {
+                                                break mainLoop;
+                                            }
+                                        }
+                                        for (int z2 = z; z2 < z + width; z2++)
+                                        {
+                                            mask[x2][z2][0] = true;
+                                        }
+                                    }
+                                    height++;
+                                }
+                                chunk.getRenderList().add(new Roof(rX, rZ, height, width));
+                            }
+                            if (layer == 1 && isWall(id))
+                            {
+                                handleWallRender(chunk, id, rX, rZ);
+                            }
+                            if(layer == 0 && isFloor(id) && !mask[x][z][1])
+                            {
+                                int width = 0;
+                                int height = 0;
+
+                                mainLoop: for (int x2 = x; x2 < 4; x2++)
+                                {
+                                    if (x2 == x)
+                                    {
+                                        for (int z2 = z; z2 < 4; z2++)
+                                        {
+                                            if (!mask[x2][z2][1] && isFloor(getTileOnChunkAt(chunk, layer, x2, z2)) && getFloorType(id) == getFloorType(getTileOnChunkAt(chunk, layer, x2, z2)))
+                                            {
+                                                width++;
+                                                mask[x2][z2][1] = true;
+                                            }
+                                            else
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int z2 = z; z2 < z + width; z2++)
+                                        {
+                                            if (mask[x2][z2][1] || !isFloor(getTileOnChunkAt(chunk, layer, x2, z2)) || getFloorType(id) != getFloorType(getTileOnChunkAt(chunk, layer, x2, z2)))
+                                            {
+                                                break mainLoop;
+                                            }
+                                        }
+                                        for (int z2 = z; z2 < z + width; z2++)
+                                        {
+                                            mask[x2][z2][1] = true;
+                                        }
+                                    }
+                                    height++;
+                                }
+                                chunk.getRenderList().add(new Floor(getFloorType(id), rX, rZ, height, width));
                             }
                         }
-                        //Corners
-                        else if(wallType == 8)
-                        {
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle) - 1, x, z));
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 3) - 1, x, z));
-                        }
-                        else if(wallType == 9)
-                        {
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 3) - 1, x, z));
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 5) - 1, x, z));
-                        }
-                        else if(wallType == 10)
-                        {
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 5) - 1, x, z));
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 7) - 1, x, z));
-                        }
-                        else if(wallType == 11)
-                        {
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 7) - 1, x, z));
-                            renderList.add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle) - 1, x, z));
-                        }
-                    }
-                    if (id == 37)
-                    {
-                        renderList.add(new Floor(Floor.Type.GRASS, x, z));
-                    }
-                    else if (id == 38)
-                    {
-                        renderList.add(new Floor(Floor.Type.DIRT, x, z));
-                    }
-                    else if (id == 39)
-                    {
-                        renderList.add(new Floor(Floor.Type.WOOD, x, z));
                     }
                 }
             }
         }
-        Collections.sort(renderList);
-        return renderList;
+        for(int x = 0; x < Core.instance.getCurrentLevel().getChunkArrayWidth();x++)
+        {
+            for (int z = 0; z < Core.instance.getCurrentLevel().getChunkArrayHeight(); z++)
+            {
+                Chunk chunk = Core.instance.getCurrentLevel().getChunks()[x][z];
+                Collections.sort(chunk.getRenderList());
+            }
+        }
+    }
+
+    private static byte getTileOnChunkAt(Chunk ch, int layer, int x, int z)
+    {
+        return Core.instance.getCurrentLevel().getTileAt(layer, ch.getX() * 4 + x, ch.getZ() * 4 + z);
+    }
+
+    private static void handleWallRender(Chunk chunk, int id, int x, int z)
+    {
+        int wallStyle = getWallStyle(id);
+        int wallDirection = getWallDirection(id);
+
+        if(wallDirection < 8)
+        {
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], wallDirection, x, z));
+            if (isWallNotAligned(id))
+            {
+                chunk.getRenderList().add(new Roof(x, z, 1, 1));
+            }
+        }
+        //Corners
+        else if(wallDirection == 8)
+        {
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle) - 1, x, z));
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 3) - 1, x, z));
+        }
+        else if(wallDirection == 9)
+        {
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 3) - 1, x, z));
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 5) - 1, x, z));
+        }
+        else if(wallDirection == 10)
+        {
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 5) - 1, x, z));
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 7) - 1, x, z));
+        }
+        else if(wallDirection == 11)
+        {
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle * 7) - 1, x, z));
+            chunk.getRenderList().add(new Wall(Wall.Type.values()[wallStyle - 1], (wallStyle) - 1, x, z));
+        }
+    }
+
+    public static boolean isWall(int id)
+    {
+        return id > 0 && id <= 36;
+    }
+
+    public static int getWallDirection(int id)
+    {
+        return (id - 1) % 12;
+    }
+
+    public static int getWallStyle(int id)
+    {
+        return ((id - 1) / 12) + 1;
+    }
+
+    public static boolean isWallNotAligned(int id)
+    {
+        return id % 2 == 0;
+    }
+
+    public static boolean isFloor(int id)
+    {
+        return id >= 37 && id <= 48;
+    }
+
+    public static Floor.Type getFloorType(int id)
+    {
+        return Floor.Type.values()[id - 37];
     }
 }

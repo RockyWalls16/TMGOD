@@ -2,7 +2,11 @@ package com.gp5.projettutore.game.level;
 
 import com.gp5.projettutore.game.entity.Entity;
 import com.gp5.projettutore.game.entity.EntityPlayer;
-import com.gp5.projettutore.game.render.LevelElement;
+import com.gp5.projettutore.game.render.Chunk;
+import com.gp5.projettutore.game.render.shapes.Outline;
+
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
 
 import java.util.ArrayList;
 
@@ -16,14 +20,14 @@ public class Level
     private int width;
     private int height;
 
-    /**
-     * Render list stores everything renderable in order to render everything at the same time. (Avoid lag)
-     */
-    private ArrayList<LevelElement> renderList;
+    private Chunk[][] chunks;
     private ArrayList<Entity> entityList = new ArrayList<Entity>();
 
     private EntityPlayer player1;
     private EntityPlayer player2;
+    private Outline[] levelOutline;
+
+    private World world = new World(new Vec2(0.0F, 0.0F), false);
 
     public Level(String mapName, byte[][] mapData, int width, int height, int p1X, int p1Z, int p2X, int p2Z)
     {
@@ -31,6 +35,18 @@ public class Level
         this.mapData = mapData;
         this.width = width;
         this.height = height;
+        chunks = new Chunk[getChunkArrayWidth()][getChunkArrayHeight()];
+
+        for(int x = 0; x < getChunkArrayWidth();x++)
+        {
+            for(int z = 0; z < getChunkArrayHeight();z++)
+            {
+                chunks[x][z] = new Chunk(x, z);
+            }
+        }
+
+        levelOutline = new Outline[]{new Outline(this, 0), new Outline(this, 1), new Outline(this, 2), new Outline(this, 3)};
+
         this.player1 = new EntityPlayer(this, p1X, p1Z);
         this.player2 = new EntityPlayer(this, p2X, p2Z);
 
@@ -40,6 +56,7 @@ public class Level
 
     public void tickLevel()
     {
+        world.step(1 / 60F, 8, 3);
         for(Entity entity : entityList)
         {
             entity.onUpdateTick();
@@ -55,7 +72,7 @@ public class Level
      */
     public byte getTileAt(int layer, int x, int z)
     {
-        return x < 0 || z < 0 || x >= width || z >= height ? 0 : mapData[layer][x + z * width];
+        return x < 0 || z < 0 || x >= width || z >= height ? -1 : mapData[layer][x + z * width];
     }
 
     /**
@@ -91,17 +108,29 @@ public class Level
         return height;
     }
 
-    public ArrayList<LevelElement> getRenderList()
+    public int getChunkArrayWidth()
     {
-        return renderList;
+        return (getWidth() >> 2) + 1;
     }
 
-    /**
-     * Init the render list. Must be done on level loading to create the appearance of the level
-     */
-    public void initRenderList()
+    public int getChunkArrayHeight()
     {
-        renderList = LevelUtil.getRenderList(this);
+        return (getHeight() >> 2) + 1;
+    }
+
+    public void initChunks()
+    {
+        LevelUtil.getRenderList(this);
+    }
+
+    public Chunk[][] getChunks()
+    {
+        return chunks;
+    }
+
+    public Outline[] getLevelOutline()
+    {
+        return levelOutline;
     }
 
     public String getName()
@@ -122,5 +151,10 @@ public class Level
     public EntityPlayer getPlayer1()
     {
         return player1;
+    }
+
+    public World getWorld()
+    {
+        return world;
     }
 }

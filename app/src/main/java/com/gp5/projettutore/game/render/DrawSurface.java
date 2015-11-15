@@ -2,7 +2,9 @@ package com.gp5.projettutore.game.render;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.main.TimeUtil;
@@ -16,11 +18,13 @@ import javax.microedition.khronos.opengles.GL10;
 public class DrawSurface extends GLSurfaceView implements GLSurfaceView.Renderer
 {
     private float lag = 0.0F;
+    private ScaleGestureDetector scaleHandler;
 
     public DrawSurface(Context context)
     {
         super(context);
         setRenderer(this);
+        scaleHandler = new ScaleGestureDetector(context, new ScaleHandler());
     }
 
     @Override
@@ -55,10 +59,25 @@ public class DrawSurface extends GLSurfaceView implements GLSurfaceView.Renderer
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        if(Core.instance.getCurrentGUI() != null)
+        if(event.getPointerCount() == 1)
         {
-            Core.instance.getCurrentGUI().onClick((int) event.getX(), (int) event.getY(), event.getAction());
+            if (Core.instance.getCurrentGUI() != null)
+            {
+                Core.instance.getCurrentGUI().onClick((int) event.getX(), (int) event.getY(), event.getAction());
+            }
         }
+        else
+        {
+            scaleHandler.onTouchEvent(event);
+        }
+        return true;
+    }
+}
+class ScaleHandler extends ScaleGestureDetector.SimpleOnScaleGestureListener
+{
+    public boolean onScale(ScaleGestureDetector detector)
+    {
+        GameRenderer.instance.setScaleAmount(GameRenderer.instance.getScaleAmount() + (detector.getScaleFactor() - 1) * 3);
         return true;
     }
 }

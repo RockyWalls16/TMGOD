@@ -1,11 +1,8 @@
 package com.gp5.projettutore.game.render.GUI;
 
-import android.util.Log;
-
 import com.gp5.projettutore.game.control.JoyStick;
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.main.TimeUtil;
-import com.gp5.projettutore.game.render.GameRenderer;
 import com.gp5.projettutore.game.render.Textures;
 import com.gp5.projettutore.game.render.shapes.Textured2DQuad;
 

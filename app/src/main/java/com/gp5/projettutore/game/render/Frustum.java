@@ -1,11 +1,6 @@
 package com.gp5.projettutore.game.render;
 
-import android.opengl.GLES10;
-import android.opengl.GLES20;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
+import android.opengl.GLES11;
 
 public class Frustum
 {
@@ -21,9 +16,6 @@ public class Frustum
 	public static final int C = 2;
 	public static final int D = 3;
 
-	private static FloatBuffer _proj = ByteBuffer.allocate(4 * 16).order(ByteOrder.nativeOrder()).asFloatBuffer();
-	private static FloatBuffer _modl = ByteBuffer.allocate(4 * 16).order(ByteOrder.nativeOrder()).asFloatBuffer();
-	private static FloatBuffer _clip = ByteBuffer.allocate(4 * 16).order(ByteOrder.nativeOrder()).asFloatBuffer();
 	private static float[] proj = new float[16];
 	private static float[] modl = new float[16];
 	private static float[] clip = new float[16];
@@ -40,20 +32,10 @@ public class Frustum
 
 	public static void calculateFrustum()
 	{
-		_proj.clear();
-		_modl.clear();
-		_clip.clear();
+		GLES11.glGetFloatv(GLES11.GL_PROJECTION_MATRIX, proj, 0);
+		GLES11.glGetFloatv(GLES11.GL_MODELVIEW_MATRIX, modl, 0);
 
-		GLES20.glGetFloatv(GLES10.GL_PROJECTION, _proj);
-
-		GLES20.glGetFloatv(GLES10.GL_MODELVIEW, _modl);
-
-		_proj.flip().limit(16);
-		_proj.get(proj);
-		_modl.flip().limit(16);
-		_modl.get(modl);
-
-		clip[0] = (modl[0] * proj[0] + modl[1] * proj[4] + modl[2] * proj[8] + modl[3] * proj[12]);
+        clip[0] = (modl[0] * proj[0] + modl[1] * proj[4] + modl[2] * proj[8] + modl[3] * proj[12]);
 		clip[1] = (modl[0] * proj[1] + modl[1] * proj[5] + modl[2] * proj[9] + modl[3] * proj[13]);
 		clip[2] = (modl[0] * proj[2] + modl[1] * proj[6] + modl[2] * proj[10] + modl[3] * proj[14]);
 		clip[3] = (modl[0] * proj[3] + modl[1] * proj[7] + modl[2] * proj[11] + modl[3] * proj[15]);
@@ -193,20 +175,12 @@ public class Frustum
 		{
 			return false;
 		}
-		if ((m_Frustum[FRONT][0] * x1 + m_Frustum[FRONT][1] * z1 + m_Frustum[FRONT][3] <= 0.0F) && (m_Frustum[FRONT][0] * x2 + m_Frustum[FRONT][1] * z1 + m_Frustum[FRONT][3] <= 0.0F) && (m_Frustum[FRONT][0] * x1 + m_Frustum[FRONT][1] * z2 + m_Frustum[FRONT][3] <= 0.0F) && (m_Frustum[FRONT][0] * x2 + m_Frustum[FRONT][1] * z2 + m_Frustum[FRONT][3] <= 0.0F))
-		{
-			return false;
-		}
+		return !((m_Frustum[FRONT][0] * x1 + m_Frustum[FRONT][1] * z1 + m_Frustum[FRONT][3] <= 0.0F) && (m_Frustum[FRONT][0] * x2 + m_Frustum[FRONT][1] * z1 + m_Frustum[FRONT][3] <= 0.0F) && (m_Frustum[FRONT][0] * x1 + m_Frustum[FRONT][1] * z2 + m_Frustum[FRONT][3] <= 0.0F) && (m_Frustum[FRONT][0] * x2 + m_Frustum[FRONT][1] * z2 + m_Frustum[FRONT][3] <= 0.0F));
 
-		return true;
 	}
 
 	public static boolean yInFrustum(float y1, float y2)
 	{
-		if (y1 + m_Frustum[TOP][2] <= 0.0F && y2 + m_Frustum[TOP][2] <= 0.0F && y1 + m_Frustum[BOTTOM][2] <= 0.0F && y2 + m_Frustum[BOTTOM][2] <= 0.0F)
-		{
-			return false;
-		}
-		return true;
+		return !(y1 + m_Frustum[TOP][2] <= 0.0F && y2 + m_Frustum[TOP][2] <= 0.0F && y1 + m_Frustum[BOTTOM][2] <= 0.0F && y2 + m_Frustum[BOTTOM][2] <= 0.0F);
 	}
 }

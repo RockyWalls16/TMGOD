@@ -25,7 +25,8 @@ public class TexturedCameraAlignedQuad
     {
         this.textureId = textureId;
 
-        float[] vertices = new float[]{0, 0, 0, sX, 0, 0, 0, sY, 0, sX, sY, 0};
+        float x = (float) sX / 2F;
+        float[] vertices = new float[]{-x, 0, 0, x, 0, 0, -x, sY, 0, x, sY, 0};
         float[] texCoords = new float[]{tx, ty, tx2, ty, tx, ty2, tx2, ty2};
 
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -46,7 +47,7 @@ public class TexturedCameraAlignedQuad
         Textures.bindTexture(textureId);
         GLES10.glPushMatrix();
 
-        GLES10.glTranslatef(x + 0.5F, 0, z + 0.5F);
+        GLES10.glTranslatef(x, 0, z);
         GLES10.glRotatef(-GameRenderer.instance.getRotation() - 180F, 0.0F, 1.0F, 0.0F);
         //GLES10.glTranslatef(-0.5F, 0, -0.5F);
 

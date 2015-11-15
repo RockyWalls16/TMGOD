@@ -88,8 +88,13 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="kollider-v0.3" level="project" />
+    <orderEntry type="library" exported="" name="JBox2D-2.0.1-b250-Library" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-simple-1.6.6" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.1.1" level="project" />
+    <orderEntry type="library" exported="" name="jbox2d-library-2.1.2.2" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.1.1" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.6.6" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.1.1" level="project" />
   </component>
 </module>

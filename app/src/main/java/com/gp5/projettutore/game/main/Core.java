@@ -4,7 +4,6 @@ import com.gp5.projettutore.game.entity.EntityPlayer;
 import com.gp5.projettutore.game.level.Level;
 import com.gp5.projettutore.game.level.LevelUtil;
 import com.gp5.projettutore.game.render.GUI.GUI;
-import com.gp5.projettutore.game.render.GameRenderer;
 
 public class Core
 {
@@ -23,7 +22,7 @@ public class Core
     {
         try
         {
-            level = LevelUtil.decodeLevel("test_big");
+            level = LevelUtil.decodeLevel("very_big");
             player = level.getPlayer1();
         }
         catch(Exception e)

@@ -1,7 +1,9 @@
 package com.gp5.projettutore.game.render.shapes;
 
 import android.opengl.GLES10;
+import android.util.Log;
 
+import com.gp5.projettutore.game.level.LevelUtil;
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.render.LevelElement;
 import com.gp5.projettutore.game.render.Textures;
@@ -15,35 +17,6 @@ import java.nio.FloatBuffer;
  */
 public class Roof extends LevelElement
 {
-    private static float[] colors = {1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F};
-
-    private static float[][] vertices = {
-            {0.0F, 2.0F, 0.0F,
-            1.0F, 2.0F, 0.0F,
-            0.0F, 2.0F,  1.0F,
-            1.0F, 2.0F,  1.0F},
-
-            //1
-            {0.0F, 2.0F, 0.0F,
-            1.0F, 2.0F, 1.0F,
-            0.0F, 2.0F, 1.0F},
-
-            //2
-            {0.0F, 2.0F, 0.0F,
-            1.0F, 2.0F, 0.0F,
-            0.0F, 2.0F, 1.0F},
-
-            //3
-            {0.0F, 2.0F, 0.0F,
-            1.0F, 2.0F, 0.0F,
-            1.0F, 2.0F, 1.0F},
-
-            //4
-            {0.0F, 2.0F, 1.0F,
-            1.0F, 2.0F, 0.0F,
-            1.0F, 2.0F, 1.0F},
-    };
-
     private static float[] texCoords = {
             0.0f, 1.0f,
             1.0f, 1.0f,
@@ -52,20 +25,19 @@ public class Roof extends LevelElement
     };
 
     private FloatBuffer vertexBuffer;
-    private FloatBuffer colorBuffer;
     private FloatBuffer texBuffer;
 
-    private int x;
-    private int z;
-    private int corner;
-
-    public Roof(int x, int z)
+    public Roof(int x, int z, int width, int height)
     {
-        int wall = Core.instance.getCurrentLevel().getWallAt(x, z);
+        float[] vertexArray;
+        float[] textureArray;
 
-        if(wall > 0 && wall <= 36)
+        int corner = 0;
+
+        int wall = Core.instance.getCurrentLevel().getWallAt(x, z);
+        if(LevelUtil.isWall(wall))
         {
-            wall = (wall - 1) % 12;
+            wall = LevelUtil.getWallDirection(wall);
 
             if(wall == 1)
             {
@@ -85,22 +57,46 @@ public class Roof extends LevelElement
             }
         }
 
-        this.x = x;
-        this.z = z;
+        if(corner > 0)
+        {
+            textureArray = texCoords;
 
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertices[corner].length * 4);
+            switch(corner)
+            {
+                case 1:
+                {
+                    vertexArray = new float[]{x, 2.0F, z, x + width, 2.0F, z + height, x, 2.0F, z + height};
+                    break;
+                }
+                case 2:
+                {
+                    vertexArray = new float[]{x, 2.0F, z, x + width, 2.0F, z, x, 2.0F, z + height};
+                    break;
+                }
+                case 3:
+                {
+                    vertexArray = new float[]{x, 2.0F, z, x + width, 2.0F, z, x + width, 2.0F, z + height};
+                    break;
+                }
+                default:
+                {
+                    vertexArray = new float[]{x, 2.0F, z + height, x + width, 2.0F, z, x + width, 2.0F, z + height};
+                }
+            }
+        }
+        else
+        {
+            vertexArray = new float[]{x, 2.0F, z, x + width, 2.0F, z, x, 2.0F, z + height, x + width, 2.0F, z + height};
+            textureArray = new float[]{0.0F, 1.0F / (float) height, 1.0F / (float) width, 1.0F / (float) height, 0.0F, 0.0F, 1.0F / (float) width, 0.0F};
+        }
+
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertexArray.length * 4);
         bb.order(ByteOrder.nativeOrder());
         vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(vertices[corner]);
+        vertexBuffer.put(vertexArray);
         vertexBuffer.position(0);
 
-        ByteBuffer cbb = ByteBuffer.allocateDirect(colors.length * 4);
-        cbb.order(ByteOrder.nativeOrder());
-        colorBuffer = cbb.asFloatBuffer();
-        colorBuffer.put(colors);
-        colorBuffer.position(0);
-
-        ByteBuffer tbb = ByteBuffer.allocateDirect(texCoords.length * 4);
+        ByteBuffer tbb = ByteBuffer.allocateDirect(textureArray.length * 4);
         tbb.order(ByteOrder.nativeOrder());
         texBuffer = tbb.asFloatBuffer();
         texBuffer.put(texCoords);
@@ -110,22 +106,16 @@ public class Roof extends LevelElement
     public void draw()
     {
         Textures.bindTexture(Textures.cellingTexture);
-        GLES10.glPushMatrix();
-        GLES10.glTranslatef(x, 0, z);
         GLES10.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
-        GLES10.glEnableClientState(GLES10.GL_COLOR_ARRAY);
         GLES10.glEnableClientState(GLES10.GL_TEXTURE_COORD_ARRAY);
 
         GLES10.glVertexPointer(3, GLES10.GL_FLOAT, 0, vertexBuffer);
-        GLES10.glColorPointer(4, GLES10.GL_FLOAT, 0, colorBuffer);
         GLES10.glTexCoordPointer(2, GLES10.GL_FLOAT, 0, texBuffer);
 
-        GLES10.glDrawArrays(GLES10.GL_TRIANGLE_STRIP, 0, corner == 0 ? 4 : 3);
+        GLES10.glDrawArrays(GLES10.GL_TRIANGLE_STRIP, 0, vertexBuffer.capacity() == 12 ? 4 : 3);
 
         GLES10.glDisableClientState(GLES10.GL_TEXTURE_COORD_ARRAY);
-        GLES10.glDisableClientState(GLES10.GL_COLOR_ARRAY);
         GLES10.glDisableClientState(GLES10.GL_VERTEX_ARRAY);
-        GLES10.glPopMatrix();
     }
 
     @Override

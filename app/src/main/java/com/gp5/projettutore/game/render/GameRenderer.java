@@ -7,12 +7,10 @@ import android.opengl.GLU;
 import com.gp5.projettutore.game.entity.Entity;
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.render.GUI.IngameGUI;
+import com.gp5.projettutore.game.render.shapes.Outline;
 
 import javax.microedition.khronos.opengles.GL10;
 
-/**
- * Created by Valentin on 09/09/2015.
- */
 public class GameRenderer
 {
     public static GameRenderer instance = new GameRenderer();
@@ -21,6 +19,7 @@ public class GameRenderer
     private int height;
 
     private float rotation;
+    private float scaleAmount;
 
     public void onRenderTick(float delta, GL10 gl)
     {
@@ -31,9 +30,9 @@ public class GameRenderer
             switch3D(gl);
             GLES10.glLoadIdentity();
             GLES10.glRotatef(45F, 1.0F, 0.0F, 0.0F);
-            GLES10.glTranslatef(0.0F, 0.0F, -8.5F);
+            GLES10.glTranslatef(0.0F, 0.0F, -8.5F - scaleAmount);
             GLES10.glRotatef(Core.rotateAngle * 45F, 0.0F, 1.0F, 0.0F);
-            GLES10.glTranslatef(-Core.instance.getPlayer().getRenderX(delta) - 0.5F, -10.0F, -Core.instance.getPlayer().getRenderZ(delta) - 0.5F);
+            GLES10.glTranslatef(-Core.instance.getPlayer().getRenderX(delta) - 0.5F, -10.0F - scaleAmount, -Core.instance.getPlayer().getRenderZ(delta) - 0.5F);
             rotation = Core.rotateAngle * 45F;
             GLES10.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             Frustum.calculateFrustum();
@@ -55,12 +54,11 @@ public class GameRenderer
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
         GLES20.glHint(GLES10.GL_PERSPECTIVE_CORRECTION_HINT, GLES10.GL_NICEST);
         GLES10.glShadeModel(GLES10.GL_SMOOTH);
-        GLES20.glCullFace(GLES20.GL_FRONT);
         GLES20.glDisable(GLES20.GL_DITHER);
         GLES20.glEnable(GLES20.GL_TEXTURE_2D);
 
         Textures.init();
-        Core.instance.getCurrentLevel().initRenderList();
+        Core.instance.getCurrentLevel().initChunks();
         Core.instance.displayGUI(new IngameGUI());
     }
 
@@ -84,7 +82,6 @@ public class GameRenderer
         GLU.gluPerspective(gl, 45F, ratio, 0.1F, 100.0F);
         GLES10.glMatrixMode(GLES10.GL_MODELVIEW);
         GLES10.glLoadIdentity();
-
         GLES10.glEnable(GLES10.GL_DEPTH_TEST);
     }
 
@@ -106,20 +103,29 @@ public class GameRenderer
     {
         if(Core.instance.getCurrentLevel() != null)
         {
-            for (LevelElement element : Core.instance.getCurrentLevel().getRenderList())
+            for(Outline outline : Core.instance.getCurrentLevel().getLevelOutline())
             {
-               element.draw();
+                outline.draw();
+            }
+            for(int x = 0; x < Core.instance.getCurrentLevel().getChunkArrayWidth();x++)
+            {
+                for(int z = 0; z < Core.instance.getCurrentLevel().getChunkArrayHeight();z++)
+                {
+                    Chunk chunk = Core.instance.getCurrentLevel().getChunks()[x][z];
+                    if(Frustum.cubeInFrustum(chunk.getX() * 4, 0.0F, chunk.getZ() * 4, chunk.getX() * 4 + 4, 2.0F, chunk.getZ() * 4 + 4))
+                    {
+                        for (LevelElement element : chunk.getRenderList())
+                        {
+                            element.draw();
+                        }
+                    }
+                }
             }
             for (Entity entity : Core.instance.getCurrentLevel().getEntityList())
             {
                 entity.render(delta);
             }
         }
-    }
-
-    public void renderEntities(float delta)
-    {
-
     }
 
     public void renderGUI(float delta)
@@ -143,5 +149,15 @@ public class GameRenderer
     public float getRotation()
     {
         return rotation;
+    }
+
+    public void setScaleAmount(float scaleAmount)
+    {
+        this.scaleAmount = Math.max(0.0F, Math.min(scaleAmount, 15.0F));
+    }
+
+    public float getScaleAmount()
+    {
+        return scaleAmount;
     }
 }
