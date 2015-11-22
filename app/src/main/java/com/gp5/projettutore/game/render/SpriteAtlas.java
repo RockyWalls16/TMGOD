@@ -7,7 +7,7 @@ import com.gp5.projettutore.game.render.shapes.TexturedCameraAlignedQuad;
  */
 public class SpriteAtlas
 {
-    private int textureID;
+    private Texture texture;
     private int gridWidth;
     private int gridHeight;
     private int columnAmount;
@@ -16,9 +16,9 @@ public class SpriteAtlas
     private TexturedCameraAlignedQuad[] quadList;
     private int currentFrame;
 
-    public SpriteAtlas(int textureID, int gridWidth, int gridHeight, int columnAmount, int rowAmount, int sX, int sY)
+    public SpriteAtlas(Texture texture, int gridWidth, int gridHeight, int columnAmount, int rowAmount, int sX, int sY, boolean alignX)
     {
-        this.textureID = textureID;
+        this.texture = texture;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
         this.columnAmount = columnAmount;
@@ -30,7 +30,7 @@ public class SpriteAtlas
             int gridX = i % columnAmount * gridWidth;
             int gridY = i / columnAmount * gridHeight;
 
-            quadList[i] = new TexturedCameraAlignedQuad(textureID, sX, sY, gridX, gridY, gridX + gridWidth, gridY + gridHeight);
+            quadList[i] = new TexturedCameraAlignedQuad(texture, sX, sY, gridX, gridY, gridX + gridWidth, gridY + gridHeight, alignX);
         }
     }
 

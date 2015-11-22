@@ -1,6 +1,6 @@
 package com.gp5.projettutore.game.render.GUI;
 
-import com.gp5.projettutore.game.render.Textures;
+import com.gp5.projettutore.game.render.Texture;
 import com.gp5.projettutore.game.render.shapes.Textured2DQuad;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class FontRenderer
 				float tx = character % GRID_SIZE * CELL_SIZE;
 				float ty = character / GRID_SIZE * CELL_SIZE;
 
-                quadList.add(new Textured2DQuad(Textures.fontTexture, 16, 16, tx, ty, tx + 0.0625F, ty + 0.0625F));
+                quadList.add(new Textured2DQuad(Texture.fontTexture, 16, 16, tx, ty, tx + 0.0625F, ty + 0.0625F));
 			}
 		}
 

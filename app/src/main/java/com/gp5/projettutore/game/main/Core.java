@@ -8,12 +8,13 @@ import com.gp5.projettutore.game.render.GUI.GUI;
 public class Core
 {
     public static final Core instance = new Core();
-    public static int rotateAngle;
+    public static float rotateAngle;
 
     private static GUI currentGUI;
     private static Level level;
 
     private static EntityPlayer player;
+    private static EntityPlayer friend;
 
     /**
      * Called on activity creation
@@ -22,8 +23,10 @@ public class Core
     {
         try
         {
-            level = LevelUtil.decodeLevel("very_big");
+            level = LevelUtil.decodeLevel(MainActivity.mapName);
             player = level.getPlayer1();
+            friend = level.getPlayer2();
+            Core.instance.getCurrentLevel().initChunks();
         }
         catch(Exception e)
         {
@@ -70,5 +73,10 @@ public class Core
     public EntityPlayer getPlayer()
     {
         return player;
+    }
+
+    public EntityPlayer getFriend()
+    {
+        return friend;
     }
 }

@@ -56,6 +56,6 @@ public class FontColor
 	@Override
 	public String toString()
 	{
-		return "?" + specialChar;
+		return "☯" + specialChar;
 	}
 }

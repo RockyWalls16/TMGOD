@@ -2,18 +2,24 @@ package com.gp5.projettutore.game.level;
 
 import com.gp5.projettutore.game.entity.Entity;
 import com.gp5.projettutore.game.entity.EntityPlayer;
+import com.gp5.projettutore.game.entity.EntityPortalShoot;
 import com.gp5.projettutore.game.render.Chunk;
+import com.gp5.projettutore.game.render.GameRenderer;
 import com.gp5.projettutore.game.render.shapes.Outline;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.Contact;
 
 import java.util.ArrayList;
 
 /**
  * Level class store everythings for level logic and rendering
  */
-public class Level
+public class Level implements ContactListener
 {
     private String mapName;
     private byte[][] mapData; //Map content (Walls, floor, Entities...)
@@ -47,11 +53,15 @@ public class Level
 
         levelOutline = new Outline[]{new Outline(this, 0), new Outline(this, 1), new Outline(this, 2), new Outline(this, 3)};
 
-        this.player1 = new EntityPlayer(this, p1X, p1Z);
-        this.player2 = new EntityPlayer(this, p2X, p2Z);
+        this.player1 = new EntityPlayer(this, p1X, p1Z, true);
+        this.player2 = new EntityPlayer(this, p2X, p2Z, false);
 
         player1.spawnEntity();
         player2.spawnEntity();
+
+        GameRenderer.instance.setCamera(player1);
+
+        getWorld().setContactListener(this);
     }
 
     public void tickLevel()
@@ -157,4 +167,31 @@ public class Level
     {
         return world;
     }
+
+    @Override
+    public void beginContact(Contact contact)
+    {
+        if(contact.isTouching())
+        {
+            if(contact.getFixtureA().m_userData instanceof EntityPortalShoot)
+            {
+                getWorld().destroyBody(contact.getFixtureA().getBody());
+                entityList.remove(contact.getFixtureA().m_userData);
+            }
+            if(contact.getFixtureB().m_userData instanceof EntityPortalShoot)
+            {
+                getWorld().destroyBody(contact.getFixtureB().getBody());
+                entityList.remove(contact.getFixtureB().m_userData);
+            }
+        }
+    }
+
+    @Override
+    public void endContact(Contact contact) {}
+
+    @Override
+    public void preSolve(Contact contact, Manifold manifold) {}
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse contactImpulse){}
 }

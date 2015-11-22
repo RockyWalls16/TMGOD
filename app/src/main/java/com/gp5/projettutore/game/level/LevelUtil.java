@@ -1,8 +1,11 @@
 package com.gp5.projettutore.game.level;
 
+import android.util.Log;
+
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.main.MainActivity;
 import com.gp5.projettutore.game.render.Chunk;
+import com.gp5.projettutore.game.render.shapes.AnimatedWall;
 import com.gp5.projettutore.game.render.shapes.Floor;
 import com.gp5.projettutore.game.render.shapes.Roof;
 import com.gp5.projettutore.game.render.shapes.Wall;
@@ -112,7 +115,19 @@ public class LevelUtil
 
                             int id = getTileOnChunkAt(chunk, layer, x, z);
 
-                            if(id == 0 && layer == 0 && !mask[x][z][0])
+                            if (layer == 1 && isWall(id))
+                            {
+                                handleWallRender(chunk, id, rX, rZ);
+                            }
+                            else if(layer == 1 && isSpecialWall(id))
+                            {
+                                AnimatedWall.Type type = id >= 57 ? AnimatedWall.Type.LIGHT : AnimatedWall.Type.FIRE;
+                                int direction = (id - 53) % 4;
+
+                                Log.d("TEST", direction + " " + type + " " + (id - 53));
+                                chunk.getRenderList().add(new AnimatedWall(type, direction, rX, rZ));
+                            }
+                            else if(id == 0 && layer == 0 && !mask[x][z][0])
                             {
                                 int width = 0;
                                 int height = 0;
@@ -152,11 +167,7 @@ public class LevelUtil
                                 }
                                 chunk.getRenderList().add(new Roof(rX, rZ, height, width));
                             }
-                            if (layer == 1 && isWall(id))
-                            {
-                                handleWallRender(chunk, id, rX, rZ);
-                            }
-                            if(layer == 0 && isFloor(id) && !mask[x][z][1])
+                            else if(layer == 0 && isFloor(id) && !mask[x][z][1])
                             {
                                 int width = 0;
                                 int height = 0;
@@ -255,6 +266,11 @@ public class LevelUtil
     public static boolean isWall(int id)
     {
         return id > 0 && id <= 36;
+    }
+
+    public static boolean isSpecialWall(int id)
+    {
+        return id >= 53 && id <= 60;
     }
 
     public static int getWallDirection(int id)

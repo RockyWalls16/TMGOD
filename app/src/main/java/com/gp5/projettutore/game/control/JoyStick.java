@@ -5,12 +5,6 @@ package com.gp5.projettutore.game.control;
  */
 public class JoyStick
 {
-    /*private static EnumDirection joystickDirection;
-
-    public static EnumDirection getJoystickDirection()
-    {
-        return joystickDirection;
-    }*/
     private static float angle;
     private static float force = 0F;
 

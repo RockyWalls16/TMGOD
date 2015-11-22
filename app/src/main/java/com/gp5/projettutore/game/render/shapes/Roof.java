@@ -1,12 +1,11 @@
 package com.gp5.projettutore.game.render.shapes;
 
 import android.opengl.GLES10;
-import android.util.Log;
 
 import com.gp5.projettutore.game.level.LevelUtil;
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.render.LevelElement;
-import com.gp5.projettutore.game.render.Textures;
+import com.gp5.projettutore.game.render.Texture;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -87,7 +86,7 @@ public class Roof extends LevelElement
         else
         {
             vertexArray = new float[]{x, 2.0F, z, x + width, 2.0F, z, x, 2.0F, z + height, x + width, 2.0F, z + height};
-            textureArray = new float[]{0.0F, 1.0F / (float) height, 1.0F / (float) width, 1.0F / (float) height, 0.0F, 0.0F, 1.0F / (float) width, 0.0F};
+            textureArray = new float[]{0.0F, height, width, height, 0.0F, 0.0F, width, 0.0F};
         }
 
         ByteBuffer bb = ByteBuffer.allocateDirect(vertexArray.length * 4);
@@ -99,13 +98,13 @@ public class Roof extends LevelElement
         ByteBuffer tbb = ByteBuffer.allocateDirect(textureArray.length * 4);
         tbb.order(ByteOrder.nativeOrder());
         texBuffer = tbb.asFloatBuffer();
-        texBuffer.put(texCoords);
+        texBuffer.put(textureArray);
         texBuffer.position(0);
     }
 
     public void draw()
     {
-        Textures.bindTexture(Textures.cellingTexture);
+        Texture.bindTexture(Texture.cellingTexture.getTextureID());
         GLES10.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
         GLES10.glEnableClientState(GLES10.GL_TEXTURE_COORD_ARRAY);
 
@@ -122,5 +121,11 @@ public class Roof extends LevelElement
     public int getRenderID()
     {
         return -1;
+    }
+
+    @Override
+    public boolean isOpaque()
+    {
+        return true;
     }
 }

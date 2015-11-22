@@ -2,12 +2,12 @@ package com.gp5.projettutore.game.render;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.main.TimeUtil;
+import com.gp5.projettutore.game.render.shapes.AnimatedWall;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -19,6 +19,8 @@ public class DrawSurface extends GLSurfaceView implements GLSurfaceView.Renderer
 {
     private float lag = 0.0F;
     private ScaleGestureDetector scaleHandler;
+    private boolean coreReady = false;
+    private int time = 0;
 
     public DrawSurface(Context context)
     {
@@ -43,12 +45,22 @@ public class DrawSurface extends GLSurfaceView implements GLSurfaceView.Renderer
     @Override
     public void onDrawFrame(GL10 gl)
     {
+        if(!coreReady)
+        {
+            Core.instance.initCore();
+            coreReady = true;
+        }
         TimeUtil.updateFPS();
 
         int delta = TimeUtil.getDelta();
         lag += delta;
         while (lag >= 50)
         {
+            time++;
+            if(time % 3 == 0)
+            {
+                AnimatedWall.updateAnimations();
+            }
             Core.instance.onLogicTick();
             lag -= 50;
         }
@@ -77,7 +89,7 @@ class ScaleHandler extends ScaleGestureDetector.SimpleOnScaleGestureListener
 {
     public boolean onScale(ScaleGestureDetector detector)
     {
-        GameRenderer.instance.setScaleAmount(GameRenderer.instance.getScaleAmount() + (detector.getScaleFactor() - 1) * 3);
+        GameRenderer.instance.setScaleAmount(GameRenderer.instance.getScaleAmount() - (detector.getScaleFactor() - 1) * 5);
         return true;
     }
 }

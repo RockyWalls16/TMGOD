@@ -20,58 +20,41 @@ import java.nio.FloatBuffer;
 /**
  * Created by Valentin on 13/09/2015.
  */
-public class Wall extends LevelElement
+public class AnimatedWall extends LevelElement
 {
     private static float[] colors = {0.6F, 0.6F, 0.6F, 1.0F, 0.6F, 0.6F, 0.6F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F};
 
     private static float[][] vertices = {
 
             //Direction 0
-            {1.0F, 0.0F, 0.0F,
-            0.0F, 0.0F, 0.0F,
-            1.0F,  2.0F, 0.0F,
-            0.0F,  2.0F, 0.0F},
+            {0.0F, 0.0F,  1.0F,
+            1.0F, 0.0F, 0.0F,
+            0.0F,  2.0F,  1.0F,
+            1.0F,  2.0F, 0.0F},
 
+            //Direction 1
             {1.0F, 0.0F,  1.0F,
             0.0F, 0.0F, 0.0F,
             1.0F,  2.0F,  1.0F,
             0.0F,  2.0F, 0.0F},
 
             //Direction 2
-            {1.0F, 0.0F,  1.0F,
-            1.0F, 0.0F, 0.0F,
-            1.0F,  2.0F,  1.0F,
-            1.0F,  2.0F, 0.0F},
+            {1.0F, 0.0F, 0.5F,
+            0.0F, 0.0F, 0.5F,
+            1.0F,  2.0F, 0.5F,
+            0.0F,  2.0F, 0.5F},
 
-            {0.0F, 0.0F,  1.0F,
-            1.0F, 0.0F, 0.0F,
-            0.0F,  2.0F,  1.0F,
-            1.0F,  2.0F, 0.0F},
+            //Direction 3
+            {0.5F, 0.0F,  1.0F,
+            0.5F, 0.0F, 0.0F,
+            0.5F,  2.0F,  1.0F,
+            0.5F,  2.0F, 0.0F},
 
             //Direction 4
             {0.0F, 0.0F,  1.0F,
             1.0F, 0.0F,  1.0F,
             0.0F,  2.0F,  1.0F,
-            1.0F,  2.0F,  1.0F},
-
-            {0.0F, 0.0F,  0.0F,
-            1.0F, 0.0F,  1.0F,
-            0.0F,  2.0F,  0.0F,
-            1.0F,  2.0F,  1.0F},
-
-            //Direction 6
-
-            {0.0F, 0.0F, 0.0F,
-             0.0F, 0.0F,  1.0F,
-             0.0F,  2.0F, 0.0F,
-             0.0F,  2.0F,  1.0F},
-
-            //Direction 7
-            {1.0F, 0.0F, 0.0F,
-            0.0F, 0.0F, 1.0F,
-            1.0F,  2.0F, 0.0F,
-            0.0F,  2.0F, 1.0F}
-
+            1.0F,  2.0F,  1.0F}
     };
 
     private static float[] texCoords = {
@@ -90,7 +73,7 @@ public class Wall extends LevelElement
     private int x;
     private int z;
 
-    public Wall(Type type, int direction, int x, int z)
+    public AnimatedWall(Type type, int direction, int x, int z)
     {
         this.type = type;
         this.x = x;
@@ -121,7 +104,7 @@ public class Wall extends LevelElement
 
         if(direction == 0)
         {
-            boxShape.set(new Vec2[]{new Vec2(0.0F, 0.0F), new Vec2(1.0F, 0.0F)}, 2);
+            boxShape.set(new Vec2[]{new Vec2(0.0F, 1.0F), new Vec2(1.0F, 0.0F)}, 2);
         }
         else if(direction == 1)
         {
@@ -129,40 +112,25 @@ public class Wall extends LevelElement
         }
         else if(direction == 2)
         {
-            boxShape.set(new Vec2[]{new Vec2(1.0F, 0.0F), new Vec2(1.0F, 1.0F)}, 2);
+            boxShape.set(new Vec2[]{new Vec2(0.0F, 0.5F), new Vec2(1.0F, 0.5F)}, 2);
         }
         else if(direction == 3)
         {
-            boxShape.set(new Vec2[]{new Vec2(1.0F, 0.0F), new Vec2(0.0F, 1.0F)}, 2);
-        }
-        else if(direction == 4)
-        {
-            boxShape.set(new Vec2[]{new Vec2(0.0F, 1.0F), new Vec2(1.0F, 1.0F)}, 2);
-        }
-        else if(direction == 5)
-        {
-            boxShape.set(new Vec2[]{new Vec2(0.0F, 0.0F), new Vec2(1.0F, 1.0F)}, 2);
-        }
-        else if(direction == 6)
-        {
-            boxShape.set(new Vec2[]{new Vec2(0.0F, 0.0F), new Vec2(0.0F, 1.0F)}, 2);
-        }
-        else if(direction == 7)
-        {
-            boxShape.set(new Vec2[]{new Vec2(1.0F, 0.0F), new Vec2(0.0F, 1.0F)}, 2);
+            boxShape.set(new Vec2[]{new Vec2(0.5F, 0.0F), new Vec2(0.5F, 1.0F)}, 2);
         }
 
         Body body = Core.instance.getCurrentLevel().getWorld().createBody(boxDef);
         FixtureDef boxFixture = new FixtureDef();
-        boxFixture.filter.categoryBits = type == Type.GRID ? 0x0002 : 0x0001;
+        boxFixture.filter.categoryBits = 0x0008;
         boxFixture.density = 0.1f;
         boxFixture.shape = boxShape;
+        boxFixture.userData = this;
         body.createFixture(boxFixture);
     }
 
     public void draw()
     {
-        Texture.bindTexture(type.texture.getTextureID());
+        Texture.bindTexture(type.textures[type.animation].getTextureID());
         GLES10.glPushMatrix();
         GLES10.glTranslatef(x, 0, z);
 
@@ -186,26 +154,57 @@ public class Wall extends LevelElement
     @Override
     public int getRenderID()
     {
-        return isOpaque() ? type.ordinal() : 100;
+        return type.ordinal() + 101;
     }
 
     @Override
     public boolean isOpaque()
     {
-        return type != Type.GRID;
+        return false;
+    }
+
+    public static void updateAnimations()
+    {
+        for(Type type : Type.values())
+        {
+            type.updateAnimation();
+        }
     }
 
     public enum Type
     {
-        NORMAL(Texture.wallTexture1),
-        INSTABLE(Texture.wallTexture2),
-        GRID(Texture.wallTexture3);
+        FIRE(Texture.fireWall),
+        LIGHT(Texture.lightWall);
 
-        public final Texture texture;
+        public final Texture[] textures;
+        public int animation;
+        private boolean cycle = false;
 
-        Type(Texture texture)
+        Type(Texture[] textures)
         {
-            this.texture = texture;
+            this.textures = textures;
+        }
+
+        public void updateAnimation()
+        {
+            if(cycle)
+            {
+                animation--;
+
+                if(animation == 0)
+                {
+                    cycle = false;
+                }
+            }
+            else
+            {
+                animation++;
+
+                if(animation == textures.length - 1)
+                {
+                    cycle = true;
+                }
+            }
         }
     }
 }

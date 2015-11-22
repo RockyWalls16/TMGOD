@@ -4,7 +4,7 @@ import android.opengl.GLES10;
 
 import com.gp5.projettutore.game.level.Level;
 import com.gp5.projettutore.game.render.LevelElement;
-import com.gp5.projettutore.game.render.Textures;
+import com.gp5.projettutore.game.render.Texture;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -108,7 +108,7 @@ public class Outline extends LevelElement
 
     public void draw()
     {
-        Textures.bindTexture(Textures.cellingTexture);
+        Texture.bindTexture(Texture.cellingTexture.getTextureID());
         GLES10.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
         GLES10.glEnableClientState(GLES10.GL_TEXTURE_COORD_ARRAY);
 
@@ -126,5 +126,11 @@ public class Outline extends LevelElement
     public int getRenderID()
     {
         return -1;
+    }
+
+    @Override
+    public boolean isOpaque()
+    {
+        return true;
     }
 }

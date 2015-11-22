@@ -3,7 +3,7 @@ package com.gp5.projettutore.game.render.shapes;
 import android.opengl.GLES10;
 
 import com.gp5.projettutore.game.render.GameRenderer;
-import com.gp5.projettutore.game.render.Textures;
+import com.gp5.projettutore.game.render.Texture;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,23 +11,27 @@ import java.nio.FloatBuffer;
 
 public class TexturedCameraAlignedQuad
 {
-    private int textureId;
+    private Texture texture;
 
     private FloatBuffer vertexBuffer;
     private FloatBuffer texBuffer;
 
-    public TexturedCameraAlignedQuad(int textureId, int sX, int sY, int tx, int ty, int tx2, int ty2)
+    private boolean alignX = true;
+    private float height = 0.01F;
+
+    public TexturedCameraAlignedQuad(Texture texture, float sX, float sY, int tx, int ty, int tx2, int ty2, boolean alignX)
     {
-        this(textureId, sX, sY, tx / 256F, ty / 256F, tx2 / 256F, ty2 / 256F);
+        this(texture, sX, sY, (float) tx / (float) texture.getWidth(), (float) ty / (float) texture.getHeight(), (float) tx2 / (float) texture.getWidth(), (float) ty2 / (float) texture.getHeight(), alignX);
     }
 
-    public TexturedCameraAlignedQuad(int textureId, int sX, int sY, float tx, float ty, float tx2, float ty2)
+    public TexturedCameraAlignedQuad(Texture texture, float sX, float sY, float tx, float ty, float tx2, float ty2, boolean alignX)
     {
-        this.textureId = textureId;
+        this.texture = texture;
+        this.alignX = alignX;
 
-        float x = (float) sX / 2F;
+        float x = sX / 2F;
         float[] vertices = new float[]{-x, 0, 0, x, 0, 0, -x, sY, 0, x, sY, 0};
-        float[] texCoords = new float[]{tx, ty, tx2, ty, tx, ty2, tx2, ty2};
+        float[] texCoords = new float[]{tx2, ty2, tx, ty2, tx2, ty, tx, ty};
 
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -44,12 +48,20 @@ public class TexturedCameraAlignedQuad
 
     public void draw(float x, float z)
     {
-        Textures.bindTexture(textureId);
+        Texture.bindTexture(texture.getTextureID());
         GLES10.glPushMatrix();
 
-        GLES10.glTranslatef(x, 0, z);
-        GLES10.glRotatef(-GameRenderer.instance.getRotation() - 180F, 0.0F, 1.0F, 0.0F);
-        //GLES10.glTranslatef(-0.5F, 0, -0.5F);
+        if(!alignX)
+        {
+            GLES10.glTranslatef(x, 0, z);
+            GLES10.glRotatef(-GameRenderer.instance.getRotation() - 180F, 0.0F, 1.0F, 0.0F);
+        }
+        else
+        {
+            GLES10.glTranslatef(x, height, z);
+            GLES10.glRotatef(-GameRenderer.instance.getRotation() - 180F, 0.0F, 1.0F, 0.0F);
+            GLES10.glRotatef(90F, 1.0F, 0.0F, 0.0F);
+        }
 
         GLES10.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
         GLES10.glEnableClientState(GLES10.GL_TEXTURE_COORD_ARRAY);
@@ -62,5 +74,10 @@ public class TexturedCameraAlignedQuad
         GLES10.glDisableClientState(GLES10.GL_TEXTURE_COORD_ARRAY);
         GLES10.glDisableClientState(GLES10.GL_VERTEX_ARRAY);
         GLES10.glPopMatrix();
+    }
+
+    public void setHeight(float height)
+    {
+        this.height = height;
     }
 }

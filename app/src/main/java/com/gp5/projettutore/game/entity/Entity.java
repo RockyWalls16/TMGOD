@@ -33,16 +33,7 @@ public abstract class Entity
         this.x = x;
         this.z = z;
 
-        BodyDef boxDef = new BodyDef();
-        boxDef.position.set(x, z);
-        boxDef.type = BodyType.DYNAMIC;
-        CircleShape boxShape = new CircleShape();
-        boxShape.m_radius = 0.4F;
-        body = level.getWorld().createBody(boxDef);
-        FixtureDef boxFixture = new FixtureDef();
-        boxFixture.density = 0.1f;
-        boxFixture.shape = boxShape;
-        body.createFixture(boxFixture);
+        createBox();
     }
 
     public void onUpdateTick()
@@ -50,6 +41,9 @@ public abstract class Entity
         lastX = x;
         lastY = y;
         lastZ = z;
+
+        x = body.getPosition().x;
+        z = body.getPosition().y;
     }
 
     public float getX()
@@ -103,4 +97,20 @@ public abstract class Entity
     }
 
     public void render(float delta){}
+
+    public void createBox()
+    {
+        BodyDef boxDef = new BodyDef();
+        boxDef.position.set(x, z);
+        boxDef.type = BodyType.DYNAMIC;
+        CircleShape boxShape = new CircleShape();
+        boxShape.m_radius = 0.4F;
+        body = level.getWorld().createBody(boxDef);
+        FixtureDef boxFixture = new FixtureDef();
+        boxFixture.filter.categoryBits = 0x0003;
+        boxFixture.filter.maskBits = 0x0001 | 0x0002;
+        boxFixture.density = 0.1f;
+        boxFixture.shape = boxShape;
+        body.createFixture(boxFixture);
+    }
 }

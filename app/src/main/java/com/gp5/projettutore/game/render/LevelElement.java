@@ -9,9 +9,11 @@ public abstract class LevelElement implements Comparable<LevelElement>
 
     public abstract int getRenderID();
 
+    public abstract boolean isOpaque();
+
     @Override
     public int compareTo(LevelElement another)
     {
-        return Integer.valueOf(another.getRenderID()).compareTo(getRenderID());
+        return Integer.valueOf(getRenderID()).compareTo(another.getRenderID());
     }
 }

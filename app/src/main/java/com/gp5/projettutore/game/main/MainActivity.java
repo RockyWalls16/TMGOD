@@ -7,7 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.gp5.projettutore.game.render.DrawSurface;
-import com.gp5.projettutore.game.render.Textures;
+import com.gp5.projettutore.game.render.Texture;
 
 
 public class MainActivity extends Activity
@@ -15,6 +15,8 @@ public class MainActivity extends Activity
     private static MainActivity instance;
 
     private static DrawSurface openGLView;
+
+    public static String mapName;//TODO Remove
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,7 +28,6 @@ public class MainActivity extends Activity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        Core.instance.initCore();
         openGLView = new DrawSurface(this);
         setContentView(openGLView);
     }
@@ -39,7 +40,7 @@ public class MainActivity extends Activity
         if (openGLView != null)
         {
             openGLView.onResume();
-            Textures.init();
+            Texture.init();
         }
     }
 

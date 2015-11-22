@@ -2,7 +2,7 @@ package com.gp5.projettutore.game.render.shapes;
 
 import android.opengl.GLES10;
 
-import com.gp5.projettutore.game.render.Textures;
+import com.gp5.projettutore.game.render.Texture;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,19 +13,19 @@ import java.nio.FloatBuffer;
  */
 public class Textured2DQuad
 {
-    private int textureId;
+    private Texture texture;
 
     private FloatBuffer vertexBuffer;
     private FloatBuffer texBuffer;
 
-    public Textured2DQuad(int textureId, int sX, int sY, int tx, int ty, int tx2, int ty2)
+    public Textured2DQuad(Texture texture, int sX, int sY, int tx, int ty, int tx2, int ty2)
     {
-        this(textureId, sX, sY, tx / 256F, ty / 256F, tx2 / 256F, ty2 / 256F);
+        this(texture, sX, sY, (float) tx / (float) texture.getWidth(), (float) ty / (float) texture.getHeight(), (float) tx2 / (float) texture.getWidth(), (float) ty2 / (float) texture.getHeight());
     }
 
-    public Textured2DQuad(int textureId, int sX, int sY, float tx, float ty, float tx2, float ty2)
+    public Textured2DQuad(Texture texture, int sX, int sY, float tx, float ty, float tx2, float ty2)
     {
-        this.textureId = textureId;
+        this.texture = texture;
 
         float[] vertices = new float[]{0, 0, 0, sX, 0, 0, 0, sY, 0, sX, sY, 0};
         float[] texCoords = new float[]{tx, ty, tx2, ty, tx, ty2, tx2, ty2};
@@ -45,7 +45,7 @@ public class Textured2DQuad
 
     public void draw(int x, int y)
     {
-        Textures.bindTexture(textureId);
+        Texture.bindTexture(texture.getTextureID());
         GLES10.glPushMatrix();
         GLES10.glTranslatef(x, y, 0);
         GLES10.glEnableClientState(GLES10.GL_VERTEX_ARRAY);

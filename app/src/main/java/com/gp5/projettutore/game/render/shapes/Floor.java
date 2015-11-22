@@ -2,10 +2,8 @@ package com.gp5.projettutore.game.render.shapes;
 
 import android.opengl.GLES10;
 
-import com.gp5.projettutore.game.level.LevelUtil;
-import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.render.LevelElement;
-import com.gp5.projettutore.game.render.Textures;
+import com.gp5.projettutore.game.render.Texture;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -16,13 +14,6 @@ import java.nio.FloatBuffer;
  */
 public class Floor extends LevelElement
 {
-    private static float[] texCoords = {
-            0.0f, 1.0f,
-            1.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f
-    };
-
     private FloatBuffer vertexBuffer;
     private FloatBuffer texBuffer;
     private Type type;
@@ -31,7 +22,7 @@ public class Floor extends LevelElement
     {
         this.type = type;
         float[] vertexArray = new float[]{x, 0.0F, z, x + width, 0.0F, z, x, 0.0F, z + height, x + width, 0.0F, z + height};
-        float[] textureArray = new float[]{0.0F, 1.0F / (float) height, 1.0F / (float) width, 1.0F / (float) height, 0.0F, 0.0F, 1.0F / (float) width, 0.0F};
+        float[] textureArray = new float[]{0.0F, height, width, height, 0.0F, 0.0F, width, 0.0F};
 
         ByteBuffer bb = ByteBuffer.allocateDirect(vertexArray.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -42,13 +33,13 @@ public class Floor extends LevelElement
         ByteBuffer tbb = ByteBuffer.allocateDirect(textureArray.length * 4);
         tbb.order(ByteOrder.nativeOrder());
         texBuffer = tbb.asFloatBuffer();
-        texBuffer.put(texCoords);
+        texBuffer.put(textureArray);
         texBuffer.position(0);
     }
 
     public void draw()
     {
-        Textures.bindTexture(type.texture);
+        Texture.bindTexture(type.texture.getTextureID());
         GLES10.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
         GLES10.glEnableClientState(GLES10.GL_TEXTURE_COORD_ARRAY);
 
@@ -69,18 +60,31 @@ public class Floor extends LevelElement
 
     public enum Type
     {
-        GRASS(Textures.floorTexture1),
-        DIRT(Textures.floorTexture2),
-        WOOD(Textures.floorTexture3),
-        WATER(Textures.floorTexture4),
-        POISON(Textures.floorTexture5);
+        GRASS(Texture.floorTexture1),
+        DIRT(Texture.floorTexture2),
+        WOOD(Texture.floorTexture3),
+        WATER(Texture.floorTexture4),
+        POISON(Texture.floorTexture5),
+        SAND(Texture.floorTexture6),
+        ROCK(Texture.floorTexture7),
+        SQUARE(Texture.floorTexture8),
+        FLOWER_WHITE(Texture.floorTexture9),
+        FLOWER_BLUE(Texture.floorTexture10),
+        FLOWER_RED(Texture.floorTexture11),
+        DEEP_WATER(Texture.floorTexture12);
 
 
-        public final int texture;
+        public final Texture texture;
 
-        Type(int texture)
+        Type(Texture texture)
         {
             this.texture = texture;
         }
+    }
+
+    @Override
+    public boolean isOpaque()
+    {
+        return true;
     }
 }
