@@ -1,7 +1,9 @@
 package com.gp5.projettutore.game.render.shapes;
 
 import android.opengl.GLES10;
+import android.util.Log;
 
+import com.gp5.projettutore.game.entity.EntityPlayer;
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.render.LevelElement;
 import com.gp5.projettutore.game.render.Texture;
@@ -17,9 +19,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-/**
- * Created by Valentin on 13/09/2015.
- */
 public class Wall extends LevelElement
 {
     private static float[] colors = {0.6F, 0.6F, 0.6F, 1.0F, 0.6F, 0.6F, 0.6F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F};
@@ -90,8 +89,13 @@ public class Wall extends LevelElement
     private int x;
     private int z;
 
+    private byte portalId = -1;
+    private byte realDirection;
+    private byte direction;
+
     public Wall(Type type, int direction, int x, int z)
     {
+        this.direction = (byte) direction;
         this.type = type;
         this.x = x;
         this.z = z;
@@ -119,37 +123,83 @@ public class Wall extends LevelElement
         boxDef.type = BodyType.STATIC;
         PolygonShape boxShape = new PolygonShape();
 
+        realDirection = -1;
+
         if(direction == 0)
         {
             boxShape.set(new Vec2[]{new Vec2(0.0F, 0.0F), new Vec2(1.0F, 0.0F)}, 2);
+
+            if(Core.instance.getCurrentLevel().getFloorAt(x, z - 1) <= 0)
+            {
+                realDirection = 0;
+            }
+            else if(Core.instance.getCurrentLevel().getFloorAt(x, z + 1) <= 0)
+            {
+                realDirection = 4;
+            }
         }
         else if(direction == 1)
         {
             boxShape.set(new Vec2[]{new Vec2(0.0F, 0.0F), new Vec2(1.0F, 1.0F)}, 2);
+
+            realDirection = 1;
         }
         else if(direction == 2)
         {
             boxShape.set(new Vec2[]{new Vec2(1.0F, 0.0F), new Vec2(1.0F, 1.0F)}, 2);
+
+            if(Core.instance.getCurrentLevel().getFloorAt(x + 1, z) <= 0)
+            {
+                realDirection = 2;
+            }
+            else if(Core.instance.getCurrentLevel().getFloorAt(x - 1, z) <= 0)
+            {
+                realDirection = 6;
+            }
         }
         else if(direction == 3)
         {
             boxShape.set(new Vec2[]{new Vec2(1.0F, 0.0F), new Vec2(0.0F, 1.0F)}, 2);
+
+            realDirection = 3;
         }
         else if(direction == 4)
         {
             boxShape.set(new Vec2[]{new Vec2(0.0F, 1.0F), new Vec2(1.0F, 1.0F)}, 2);
+
+            if(Core.instance.getCurrentLevel().getFloorAt(x, z + 1) <= 0)
+            {
+                realDirection = 4;
+            }
+            else if(Core.instance.getCurrentLevel().getFloorAt(x, z - 1) <= 0)
+            {
+                realDirection = 0;
+            }
         }
         else if(direction == 5)
         {
             boxShape.set(new Vec2[]{new Vec2(0.0F, 0.0F), new Vec2(1.0F, 1.0F)}, 2);
+
+            realDirection = 5;
         }
         else if(direction == 6)
         {
             boxShape.set(new Vec2[]{new Vec2(0.0F, 0.0F), new Vec2(0.0F, 1.0F)}, 2);
+
+            if(Core.instance.getCurrentLevel().getFloorAt(x - 1, z) <= 0)
+            {
+                realDirection = 6;
+            }
+            else if(Core.instance.getCurrentLevel().getFloorAt(x + 1, z) <= 0)
+            {
+                realDirection = 2;
+            }
         }
         else if(direction == 7)
         {
             boxShape.set(new Vec2[]{new Vec2(1.0F, 0.0F), new Vec2(0.0F, 1.0F)}, 2);
+
+            realDirection = 7;
         }
 
         Body body = Core.instance.getCurrentLevel().getWorld().createBody(boxDef);
@@ -157,12 +207,13 @@ public class Wall extends LevelElement
         boxFixture.filter.categoryBits = type == Type.GRID ? 0x0002 : 0x0001;
         boxFixture.density = 0.1f;
         boxFixture.shape = boxShape;
+        boxFixture.userData = this;
         body.createFixture(boxFixture);
     }
 
     public void draw()
     {
-        Texture.bindTexture(type.texture.getTextureID());
+        Texture.bindTexture(portalId >= 0 ? Texture.portals[portalId].getTextureID() : type.texture.getTextureID());
         GLES10.glPushMatrix();
         GLES10.glTranslatef(x, 0, z);
 
@@ -181,6 +232,130 @@ public class Wall extends LevelElement
         GLES10.glDisableClientState(GLES10.GL_VERTEX_ARRAY);
 
         GLES10.glPopMatrix();
+    }
+
+    public void setPortalId(int id)
+    {
+        portalId = (byte) id;
+
+        if(id == 0 ||id == 1)//Red or blue
+        {
+            Log.d("TEST", "Wall : " + direction + " r " + realDirection);
+            EntityPlayer wizard = Core.instance.getCurrentLevel().getWizard();
+
+            if(id == 0)
+            {
+                wizard.resetPortalOne();
+                wizard.setPortal1(this);
+            }
+            else
+            {
+                wizard.resetPortalTwo();
+                wizard.setPortal2(this);
+            }
+        }
+        else if(id == 2 || id == 3)//Green or Pink
+        {
+            EntityPlayer fairy = Core.instance.getCurrentLevel().getFairy();
+
+            if(id == 2)
+            {
+                fairy.resetPortalOne();
+                fairy.setPortal1(this);
+            }
+            else
+            {
+                fairy.resetPortalTwo();
+                fairy.setPortal2(this);
+            }
+        }
+    }
+
+    public Type getType()
+    {
+        return type;
+    }
+
+    public int getPortalId()
+    {
+        return portalId;
+    }
+
+    public int getRealDirection()
+    {
+        return realDirection;
+    }
+
+    public void warpInFront(EntityPlayer player)
+    {
+        if(player.getPortalCooldown() > 0)
+        {
+            return;
+        }
+        player.setPortalCooldown(10);
+
+        float nX = x;
+        float nZ = z;
+        float angle = Core.rotateAngle;
+
+        switch(getRealDirection())
+        {
+            case 0:
+            {
+                nX += 0.5F;
+                nZ += direction == 0 ? 0.5F : 1.5F;
+                angle = 4;
+                break;
+            }
+            case 1:
+            {
+                nX += 0.0F;
+                nZ += 1.0F;
+                angle = 5;
+                break;
+            }
+            case 2:
+            {
+                nX += direction == 2 ? 0.5F : -0.5F;
+                nZ += 0.5F;
+                angle = 6;
+                break;
+            }
+            case 3:
+            {
+                angle = 7;
+                break;
+            }
+            case 4:
+            {
+                nX += 0.5F;
+                nZ += direction == 4 ? 0.5F : -0.5F;
+                angle = 0;
+                break;
+            }
+            case 5:
+            {
+                nX += 0.5F;
+                angle = 1;
+                break;
+            }
+            case 6:
+            {
+                nX += direction == 6 ? 0.5F : 1.5F;
+                nZ += 0.5F;
+                angle = 2;
+                break;
+            }
+            case 7:
+            {
+                nX += 1.0F;
+                nZ += 1.0F;
+                angle = 3;
+                break;
+            }
+        }
+        player.warp(nX, nZ);
+        Core.rotateAngle = angle;
     }
 
     @Override

@@ -153,10 +153,12 @@ public class GameRenderer
                     }
                 }
             }
+
             for (Entity entity : Core.instance.getCurrentLevel().getEntityList())
             {
                 entity.render(delta);
             }
+
             for(Chunk chunk : translucentChunks)
             {
                 int i = chunk.getRenderList().size() - 1;

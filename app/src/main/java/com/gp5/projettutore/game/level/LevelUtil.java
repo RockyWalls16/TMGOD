@@ -1,7 +1,5 @@
 package com.gp5.projettutore.game.level;
 
-import android.util.Log;
-
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.main.MainActivity;
 import com.gp5.projettutore.game.render.Chunk;
@@ -124,7 +122,6 @@ public class LevelUtil
                                 AnimatedWall.Type type = id >= 57 ? AnimatedWall.Type.LIGHT : AnimatedWall.Type.FIRE;
                                 int direction = (id - 53) % 4;
 
-                                Log.d("TEST", direction + " " + type + " " + (id - 53));
                                 chunk.getRenderList().add(new AnimatedWall(type, direction, rX, rZ));
                             }
                             else if(id == 0 && layer == 0 && !mask[x][z][0])

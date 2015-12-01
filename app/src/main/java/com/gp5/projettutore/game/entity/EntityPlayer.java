@@ -7,6 +7,7 @@ import com.gp5.projettutore.game.network.DataManager;
 import com.gp5.projettutore.game.render.GameRenderer;
 import com.gp5.projettutore.game.render.SpriteAtlas;
 import com.gp5.projettutore.game.render.Texture;
+import com.gp5.projettutore.game.render.shapes.Wall;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.common.Vec2;
@@ -27,6 +28,11 @@ public class EntityPlayer extends Entity
     private float startZ;
     private boolean isSlowed;
 
+    private Wall portal1;
+    private Wall portal2;
+
+    private int portalCooldown = 0;
+
     public EntityPlayer(Level level, float x, float z, boolean isAWizard)
     {
         super(level, x, z);
@@ -39,6 +45,11 @@ public class EntityPlayer extends Entity
     public void onUpdateTick()
     {
         super.onUpdateTick();
+
+        if(portalCooldown > 0)
+        {
+            portalCooldown--;
+        }
 
         byte floor = getLevel().getTileAt(0, (int) x, (int) z);
         isSlowed = false;
@@ -127,15 +138,29 @@ public class EntityPlayer extends Entity
         boxFixture.filter.maskBits = 0x0001 | 0x0002 | 0x0003;//Walls, grid, normal entities
         boxFixture.density = 0.1f;
         boxFixture.shape = boxShape;
+        boxFixture.userData = this;
         body.createFixture(boxFixture);
     }
 
     public void respawn()
     {
-        this.x = startX;
-        this.z = startZ;
-        this.body.setLinearVelocity(new Vec2(0, 0));
-        this.body.setTransform(new Vec2(startX, startZ), body.getAngle());
+        warp(startX, startZ);
+    }
+
+    public void resetPortalOne()
+    {
+        if(portal1 != null)
+        {
+            portal1.setPortalId(-1);
+        }
+    }
+
+    public void resetPortalTwo()
+    {
+        if(portal2 != null)
+        {
+            portal2.setPortalId(-1);
+        }
     }
 
     public boolean isAWizard()
@@ -146,5 +171,35 @@ public class EntityPlayer extends Entity
     public void setIsAWizard(boolean isAWizard)
     {
         this.isAWizard = isAWizard;
+    }
+
+    public Wall getPortal2()
+    {
+        return portal2;
+    }
+
+    public void setPortal2(Wall portal2)
+    {
+        this.portal2 = portal2;
+    }
+
+    public Wall getPortal1()
+    {
+        return portal1;
+    }
+
+    public void setPortal1(Wall portal1)
+    {
+        this.portal1 = portal1;
+    }
+
+    public int getPortalCooldown()
+    {
+        return portalCooldown;
+    }
+
+    public void setPortalCooldown(int portalCooldown)
+    {
+        this.portalCooldown = portalCooldown;
     }
 }

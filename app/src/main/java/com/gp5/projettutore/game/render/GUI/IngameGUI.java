@@ -66,7 +66,10 @@ public class IngameGUI extends GUI
 
             float angle = (float) (Math.atan2(deltaY, deltaX) * 180 / Math.PI); // Calculate the angle from x, y
 
-            Core.instance.getPlayer().shoot(-angle - 90F - GameRenderer.instance.getRotation());
+            if(Core.instance.getPlayer() != null)
+            {
+                Core.instance.getPlayer().shoot(-angle - 90F - GameRenderer.instance.getRotation());
+            }
         }
     }
 

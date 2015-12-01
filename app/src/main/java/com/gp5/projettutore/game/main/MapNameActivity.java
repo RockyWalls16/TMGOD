@@ -25,6 +25,7 @@ public class MapNameActivity extends Activity
                         MainActivity.mapName = txtUrl.getText().toString();
                         Intent intent = new Intent(MapNameActivity.this, MainActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                 }).show();
     }

@@ -47,8 +47,8 @@ public class DrawSurface extends GLSurfaceView implements GLSurfaceView.Renderer
     {
         if(!coreReady)
         {
-            Core.instance.initCore();
             coreReady = true;
+            Core.instance.initCore();
         }
         TimeUtil.updateFPS();
 

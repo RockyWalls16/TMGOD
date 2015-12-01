@@ -3,19 +3,20 @@ package com.gp5.projettutore.game.entity;
 import com.gp5.projettutore.game.level.Level;
 
 import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 
-/**
- * Created by Valentin on 29/09/2015.
- */
 public abstract class Entity
 {
     private Level level;
     private float lastX;
     private float lastZ;
+    private float nextX;
+    private float nextZ;//Used for warp
+    private boolean warped = false;
     protected float x;
     protected float z;
 
@@ -42,8 +43,19 @@ public abstract class Entity
         lastY = y;
         lastZ = z;
 
-        x = body.getPosition().x;
-        z = body.getPosition().y;
+        if(!warped)
+        {
+            x = body.getPosition().x;
+            z = body.getPosition().y;
+        }
+        else
+        {
+            warped = false;
+            x = nextX;
+            z = nextZ;
+
+            this.body.setTransform(new Vec2(x, z), body.getAngle());
+        }
     }
 
     public float getX()
@@ -112,5 +124,17 @@ public abstract class Entity
         boxFixture.density = 0.1f;
         boxFixture.shape = boxShape;
         body.createFixture(boxFixture);
+    }
+
+    public void warp(float x, float z)
+    {
+        this.x = x;
+        this.z = z;
+        this.lastX = x;
+        this.lastZ = z;
+        this.nextX = x;
+        this.nextZ = z;
+        this.warped = true;
+        this.body.setTransform(new Vec2(x, z), body.getAngle());
     }
 }

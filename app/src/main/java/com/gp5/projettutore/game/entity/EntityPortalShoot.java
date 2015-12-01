@@ -82,4 +82,9 @@ public class EntityPortalShoot extends Entity
             portal4.draw(getRenderX(delta), getRenderZ(delta));
         }
     }
+
+    public int getColor()
+    {
+        return color;
+    }
 }

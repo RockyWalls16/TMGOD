@@ -35,6 +35,7 @@ public class Texture
 
     public static Texture[] fireWall;
     public static Texture[] lightWall;
+    public static Texture[] portals;
 
     //Entities
     public static Texture wizardTexture;
@@ -118,6 +119,7 @@ public class Texture
 
         fireWall = new Texture[]{new Texture(R.drawable.fire_wall_0), new Texture(R.drawable.fire_wall_1), new Texture(R.drawable.fire_wall_2)};
         lightWall = new Texture[]{new Texture(R.drawable.light_wall_0), new Texture(R.drawable.light_wall_1), new Texture(R.drawable.light_wall_2)};
+        portals = new Texture[]{new Texture(R.drawable.portal_0), new Texture(R.drawable.portal_1), new Texture(R.drawable.portal_2), new Texture(R.drawable.portal_3)};
 
         wizardTexture = new Texture(R.drawable.wizard);
         fairyTexture = new Texture(R.drawable.fairy);
