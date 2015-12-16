@@ -1,5 +1,6 @@
 package com.gp5.projettutore.game.level;
 
+import com.gp5.projettutore.game.entity.Entity;
 import com.gp5.projettutore.game.main.Core;
 import com.gp5.projettutore.game.main.MainActivity;
 import com.gp5.projettutore.game.render.Chunk;
@@ -10,6 +11,7 @@ import com.gp5.projettutore.game.render.shapes.Wall;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -35,6 +37,8 @@ public class LevelUtil
         int p1Z = 0;
         int p2X = 0;
         int p2Z = 0;
+
+        ArrayList<Entity> entityList = new ArrayList<Entity>();
 
         String line;
         int mode = -1;
@@ -85,7 +89,10 @@ public class LevelUtil
                 }
             }
         }
-        return new Level(mapName, mapData, width, height, p1X, p1Z, p2X, p2Z);
+        Level level = new Level(mapName, mapData, width, height, p1X, p1Z, p2X, p2Z);
+        level.initEntityList(entityList);
+
+        return level;
     }
 
     /**

@@ -25,8 +25,10 @@ public abstract class GUI
 	public void onGUIClose()
 	{}
 
-	public void onClick(int mouseX, int mouseY, int action)
-	{}
+	public boolean onClick(int mouseX, int mouseY, int action)
+	{
+		return true;
+	}
 
     /**
      * Fetch width of the screen (Shortcut)

@@ -117,8 +117,8 @@ public class Texture
         floorTexture12 = new Texture(R.drawable.floor_12);
         cellingTexture = new Texture(R.drawable.roof);
 
-        fireWall = new Texture[]{new Texture(R.drawable.fire_wall_0), new Texture(R.drawable.fire_wall_1), new Texture(R.drawable.fire_wall_2)};
-        lightWall = new Texture[]{new Texture(R.drawable.light_wall_0), new Texture(R.drawable.light_wall_1), new Texture(R.drawable.light_wall_2)};
+        fireWall = new Texture[]{new Texture(R.drawable.fire_wall_0), new Texture(R.drawable.fire_wall_1), new Texture(R.drawable.fire_wall_2), new Texture(R.drawable.fire_wall_3)};
+        lightWall = new Texture[]{new Texture(R.drawable.light_wall_0), new Texture(R.drawable.light_wall_1), new Texture(R.drawable.light_wall_2), new Texture(R.drawable.light_wall_3), new Texture(R.drawable.light_wall_4), new Texture(R.drawable.light_wall_5)};
         portals = new Texture[]{new Texture(R.drawable.portal_0), new Texture(R.drawable.portal_1), new Texture(R.drawable.portal_2), new Texture(R.drawable.portal_3)};
 
         wizardTexture = new Texture(R.drawable.wizard);

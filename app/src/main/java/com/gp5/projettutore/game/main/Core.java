@@ -1,5 +1,7 @@
 package com.gp5.projettutore.game.main;
 
+import android.util.Log;
+
 import com.gp5.projettutore.game.entity.EntityPlayer;
 import com.gp5.projettutore.game.level.Level;
 import com.gp5.projettutore.game.level.LevelUtil;
@@ -30,7 +32,8 @@ public class Core
         }
         catch(Exception e)
         {
-            e.printStackTrace();
+            Log.e("TEST", "Level loading failed !");
+            Log.e("TEST", "Error :", e);
         }
     }
 

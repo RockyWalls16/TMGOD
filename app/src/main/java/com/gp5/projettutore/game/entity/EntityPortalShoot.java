@@ -21,8 +21,8 @@ public class EntityPortalShoot extends Entity
     {
         portal1.setHeight(1.0F);
         portal2.setHeight(1.0F);
-        portal3.setHeight(1.0F);
-        portal4.setHeight(1.0F);
+        portal3.setHeight(1.8F);
+        portal4.setHeight(1.8F);
     }
 
     private float motionX;

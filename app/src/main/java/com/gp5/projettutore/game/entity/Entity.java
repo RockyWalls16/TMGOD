@@ -1,6 +1,8 @@
 package com.gp5.projettutore.game.entity;
 
+import com.gp5.projettutore.game.control.EnumDirection;
 import com.gp5.projettutore.game.level.Level;
+import com.gp5.projettutore.game.main.Core;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.common.Vec2;
@@ -20,13 +22,9 @@ public abstract class Entity
     protected float x;
     protected float z;
 
-    private float motionX;
-    private float motionZ;
-
-    //Used only to fall
-    private float lastY;
-    private float y;
     protected Body body;
+
+    private EnumDirection direction = EnumDirection.NORTH;
 
     public Entity(Level level, float x, float z)
     {
@@ -40,7 +38,6 @@ public abstract class Entity
     public void onUpdateTick()
     {
         lastX = x;
-        lastY = y;
         lastZ = z;
 
         if(!warped)
@@ -68,11 +65,6 @@ public abstract class Entity
         return z;
     }
 
-    public float getY()
-    {
-        return y;
-    }
-
     public void setX(float x)
     {
         this.x = x;
@@ -86,11 +78,6 @@ public abstract class Entity
     public float getRenderX(float delta)
     {
         return (x - lastX) * delta + lastX;
-    }
-
-    public float getRenderY(float delta)
-    {
-        return (y - lastY) * delta + lastY;
     }
 
     public float getRenderZ(float delta)
@@ -136,5 +123,20 @@ public abstract class Entity
         this.nextZ = z;
         this.warped = true;
         this.body.setTransform(new Vec2(x, z), body.getAngle());
+    }
+
+    public EnumDirection getDirection()
+    {
+        return direction;
+    }
+
+    public void setDirection(EnumDirection direction)
+    {
+        this.direction = direction;
+    }
+
+    public EnumDirection getDirectionForRender()
+    {
+        return EnumDirection.values()[((direction.ordinal()) + (int) (Core.rotateAngle / 2)) % 4];
     }
 }

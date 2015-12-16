@@ -1,7 +1,6 @@
 package com.gp5.projettutore.game.render.shapes;
 
 import android.opengl.GLES10;
-import android.util.Log;
 
 import com.gp5.projettutore.game.entity.EntityPlayer;
 import com.gp5.projettutore.game.main.Core;
@@ -237,10 +236,9 @@ public class Wall extends LevelElement
     public void setPortalId(int id)
     {
         portalId = (byte) id;
-
+        
         if(id == 0 ||id == 1)//Red or blue
         {
-            Log.d("TEST", "Wall : " + direction + " r " + realDirection);
             EntityPlayer wizard = Core.instance.getCurrentLevel().getWizard();
 
             if(id == 0)

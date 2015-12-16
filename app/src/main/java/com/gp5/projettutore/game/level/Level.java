@@ -62,11 +62,6 @@ public class Level implements ContactListener
         this.player1 = new EntityPlayer(this, p1X, p1Z, true);
         this.player2 = new EntityPlayer(this, p2X, p2Z, false);
 
-        player1.spawnEntity();
-        player2.spawnEntity();
-
-        GameRenderer.instance.setCamera(player1);
-
         getWorld().setContactListener(this);
     }
 
@@ -165,6 +160,18 @@ public class Level implements ContactListener
         return entityList;
     }
 
+    public void initEntityList(ArrayList<Entity> entityList)
+    {
+        player1.spawnEntity();
+        player2.spawnEntity();
+        GameRenderer.instance.setCamera(player1);
+
+        for(Entity entity : entityList)
+        {
+            entity.spawnEntity();
+        }
+    }
+
     public EntityPlayer getPlayer2()
     {
         return player2;
@@ -234,6 +241,7 @@ public class Level implements ContactListener
 
     public void handleWallPlayerContact(Fixture thePlayer, Fixture theWall)
     {
+        EntityPlayer player = (EntityPlayer) thePlayer.m_userData;
         Wall wall = (Wall) theWall.m_userData;
         if(wall.getPortalId() != -1)
         {
@@ -243,11 +251,11 @@ public class Level implements ContactListener
 
                 if(wall.getPortalId() == 0 && wizard.getPortal2() != null)
                 {
-                    wizard.getPortal2().warpInFront(wizard);
+                    wizard.getPortal2().warpInFront(player);
                 }
                 else if(wizard.getPortal1() != null)
                 {
-                    wizard.getPortal1().warpInFront(wizard);
+                    wizard.getPortal1().warpInFront(player);
                 }
             }
             else if(wall.getPortalId() == 2 || wall.getPortalId() == 3)
@@ -256,11 +264,11 @@ public class Level implements ContactListener
 
                 if(wall.getPortalId() == 2 && fairy.getPortal2() != null)
                 {
-                    fairy.getPortal2().warpInFront(fairy);
+                    fairy.getPortal2().warpInFront(player);
                 }
                 else if(fairy.getPortal1() != null)
                 {
-                    fairy.getPortal1().warpInFront(fairy);
+                    fairy.getPortal1().warpInFront(player);
                 }
             }
         }

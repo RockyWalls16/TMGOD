@@ -1,5 +1,6 @@
 package com.gp5.projettutore.game.entity;
 
+import com.gp5.projettutore.game.control.EnumDirection;
 import com.gp5.projettutore.game.control.JoyStick;
 import com.gp5.projettutore.game.level.Level;
 import com.gp5.projettutore.game.main.Core;
@@ -17,8 +18,8 @@ import org.jbox2d.dynamics.FixtureDef;
 
 public class EntityPlayer extends Entity
 {
-    private static final SpriteAtlas SPRITE_ATLAS1 = new SpriteAtlas(Texture.wizardTexture, 128, 128, 4, 3, 1, 2, false);
-    private static final SpriteAtlas SPRITE_ATLAS2 = new SpriteAtlas(Texture.fairyTexture, 32, 32, 4, 3, 1, 2, false);
+    private static final SpriteAtlas SPRITE_ATLAS1 = new SpriteAtlas(Texture.wizardTexture, 128, 256, 4, 3, 1, 2, false);
+    private static final SpriteAtlas SPRITE_ATLAS2 = new SpriteAtlas(Texture.fairyTexture, 128, 256, 4, 3, 1, 2, false);
 
     private boolean shoot;
     private float shootAngle;
@@ -70,6 +71,29 @@ public class EntityPlayer extends Entity
             respawn();
         }
 
+        byte wall = getLevel().getTileAt(1, (int) x, (int) z);
+        if(wall >= 53 && wall <= 60)//Is Fire / Light
+        {
+            float x1 = ((int) x) + 0.5F;
+            float z1 = ((int) z) + 0.5F;
+            double distance = Math.sqrt((x1-x)*(x1-x) + (z1-z)*(z1-z));
+            if(distance < 0.15F)
+            {
+                if(wall >= 53 && wall <= 56)
+                {
+                    if(!isAWizard())
+                    {
+                        respawn();
+                    }
+                }
+                else
+                {
+                    resetPortalOne();
+                    resetPortalTwo();
+                }
+            }
+        }
+
         if(this == Core.instance.getPlayer())
         {
             DataManager.sendPlayerData(this);
@@ -83,7 +107,7 @@ public class EntityPlayer extends Entity
             shoot = false;
             EntityPortalShoot shoot = new EntityPortalShoot(getLevel(), this, shootAngle, isAWizard ? (portalColor ? 0 : 1) : (portalColor ? 2 : 3));
             shoot.spawnEntity();
-            portalColor = !portalColor;
+            togglePortal();
         }
 
         if(JoyStick.getForce() > 40)
@@ -98,9 +122,28 @@ public class EntityPlayer extends Entity
             }
             float fX = (float) Math.sin(Math.toRadians(JoyStick.getAngle() - GameRenderer.instance.getRotation())) * (isSlowed ? -2 : -8);
             float fZ = (float) Math.cos(Math.toRadians(JoyStick.getAngle() - GameRenderer.instance.getRotation())) * (isSlowed ? -2 : -8);
+
+            int angle = 360 - ((int) (JoyStick.getAngle() + (Core.rotateAngle / 2) * 90) % 360);
+
+            if((angle > 315 && angle <= 360) || (angle >= 0 && angle <= 45))
+            {
+                setDirection(EnumDirection.NORTH);
+            }
+            else if(angle > 45 && angle <= 135)
+            {
+                setDirection(EnumDirection.EAST);
+            }
+            else if(angle > 135 && angle <= 225)
+            {
+                setDirection(EnumDirection.SOUTH);
+            }
+            else
+            {
+                setDirection(EnumDirection.WEST);
+            }
+
             body.setLinearVelocity(new Vec2(fX, fZ));
-        }
-        else
+        } else
         {
             body.setLinearVelocity(new Vec2(0, 0));
         }
@@ -111,10 +154,11 @@ public class EntityPlayer extends Entity
     {
         if(isAWizard)
         {
+            SPRITE_ATLAS1.setFrame(getDirectionForRender().ordinal(), 0);
             SPRITE_ATLAS1.renderFrame(getRenderX(delta), getRenderZ(delta));
-        }
-        else
+        } else
         {
+            SPRITE_ATLAS2.setFrame(getDirectionForRender().ordinal(), 0);
             SPRITE_ATLAS2.renderFrame(getRenderX(delta), getRenderZ(delta));
         }
     }
@@ -161,6 +205,16 @@ public class EntityPlayer extends Entity
         {
             portal2.setPortalId(-1);
         }
+    }
+
+    public void togglePortal()
+    {
+        portalColor = !portalColor;
+    }
+
+    public int getPortalColor()
+    {
+        return isAWizard ? portalColor ? 0 : 1 : portalColor ? 2 : 3;
     }
 
     public boolean isAWizard()
